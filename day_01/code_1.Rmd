@@ -1,0 +1,66 @@
+---
+title: "AOC Day 1"
+author: "Dr Jeremiah MF Kelly"
+date: "2024-12-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Source
+
+The source data
+
+```{r src}
+tmp <- read.table("~/AoC_2024/day_01/test_1.txt")
+tmp
+
+dat <- read.table("~/AoC_2024/day_01/source_1.txt")
+head(dat)
+```
+
+Sort columns, 
+
+subtract and sum abs values
+
+```{r sort}
+
+tmp[,1] <- sort(tmp[,1])
+tmp[,2] <- sort(tmp[,2])
+res <- (tmp[,1] - tmp[,2])
+sum(abs(res))
+
+tmp[,1] <- sort(tmp[,1])
+tmp[,2] <- sort(tmp[,2])
+res <- (tmp[,1] - tmp[,2])
+sum(abs(res))
+
+```
+
+now similarity:
+
+defined as 
+
+```{r sim}
+tmp <- read.table("~/AoC_2024/day_01/test_1.txt")
+tmp
+
+dat <- read.table("~/AoC_2024/day_01/source_1.txt")
+head(dat)
+tmp <- dat
+nobs = length(tmp[,1])
+out <- numeric(nobs)
+for(ii in 1:nobs){
+  foo <- tmp[ii,1]*sum(tmp[ii,1]==tmp[,2])
+  out[ii] <- foo
+  print(foo)
+}
+sum(out)
+```
+
+
+  print(sum(tmp[,1]))
+}
+
