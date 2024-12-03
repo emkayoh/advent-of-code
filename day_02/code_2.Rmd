@@ -1,0 +1,94 @@
+---
+title: "AoC Day 2"
+author: "Dr Jeremiah MF Kelly"
+date: "2024-12-02"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+## Source
+
+The source data, are not all the same length so we use 'fill=TRUE'.
+
+
+```{r src}
+tmp <- tmp0 <- read.table("~/AoC_2024/day_02/test_data.txt", fill= TRUE)
+# tmp
+
+dat <- read.table("~/AoC_2024/day_02/source_02.txt", fill = TRUE)
+# head(dat)
+
+```
+
+Process each report, *rep*, for monotonicity and amplitude, but first remove the trailing NAs
+
+
+```{r train}
+tmp <- dat
+safe <- 0
+nobs <- length(tmp[,1])
+
+for(ii in 1:nobs){
+    rep <- tmp[ii,]
+    idx <- !is.na(rep)
+    rep <- rep[idx]
+    n <- length(rep)
+    out <- numeric(n-1)
+    for(jj in 1:(n - 1)){
+      out[jj] <- (rep[jj]- rep[jj+1])
+      out <- unlist(out)
+    }
+    # print(out)
+    safe = safe +   ((all(out>0)| all(out<0)) & all(abs(out)<4))
+}
+safe
+```
+
+\break
+## The Problem Dampener
+
+allows one element of the report *rep* to fail
+
+create function to check a line
+
+```{r damp}
+check <- function(rep){
+      n <- length(rep)
+      out <- numeric(n-1)
+      for(jj in 1:(n - 1)){
+        out[jj] <- (rep[jj]- rep[jj+1])
+        out <- unlist(out)
+      }
+    (all(out>0)| all(out<0)) & all(abs(out)<4)
+}
+
+
+tmp <- dat
+
+safe <- 0
+nobs <- length(tmp[,1])
+
+for(ii in 1:nobs){
+    # removes trailing NA
+    rep <- tmp[ii,]
+    idx <- !is.na(rep)
+    rep <- rep[idx]
+    for(kk in 1: length(rep)){
+    out <- check(rep[-kk])
+    if(out){
+      break
+    }
+    }
+    
+    
+
+  safe = safe + out
+}
+safe
+```

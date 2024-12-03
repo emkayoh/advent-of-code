@@ -1,8 +1,10 @@
 ---
-title: "AOC Day 1"
+title: "AoC Day 1"
 author: "Dr Jeremiah MF Kelly"
 date: "2024-12-01"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -15,10 +17,10 @@ The source data
 
 ```{r src}
 tmp <- read.table("~/AoC_2024/day_01/test_1.txt")
-tmp
+# tmp
 
 dat <- read.table("~/AoC_2024/day_01/source_1.txt")
-head(dat)
+# head(dat)
 ```
 
 Sort columns, 
@@ -44,23 +46,16 @@ now similarity:
 defined as 
 
 ```{r sim}
-tmp <- read.table("~/AoC_2024/day_01/test_1.txt")
-tmp
-
-dat <- read.table("~/AoC_2024/day_01/source_1.txt")
-head(dat)
 tmp <- dat
 nobs = length(tmp[,1])
 out <- numeric(nobs)
 for(ii in 1:nobs){
   foo <- tmp[ii,1]*sum(tmp[ii,1]==tmp[,2])
   out[ii] <- foo
-  print(foo)
+  # print(foo)
 }
 sum(out)
 ```
 
 
-  print(sum(tmp[,1]))
-}
 
