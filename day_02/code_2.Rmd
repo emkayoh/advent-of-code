@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Source
 
-The source data, are not all the same length so we use 'fill=TRUE'.
+The source data, are not all the reports are the same length so we use 'fill=TRUE'.
 
 
 ```{r src}
