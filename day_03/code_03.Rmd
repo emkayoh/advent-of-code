@@ -1,32 +1,105 @@
 ---
-title: "AoC_03"
+title: "Advent of Code Day 3"
 author: "Dr Jeremiah MF Kelly"
 date: "2024-12-02"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(stringr)
 ```
 
-## R Markdown
+## Training
+will use regex to select all 'mul(d,d)' where d? is  is some number
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r train}
+mul <- function(a,b){a*b}
+tmp <- read.table('test.txt')
+tmp
+line <- unlist(str_extract_all(tmp, 'mul\\(\\d+\\,\\d+\\)'))
+# line
+# print(length(line))
+out = 0
+for(ii in 1:length(line)){
+ out <- out + eval(str2expression(line[ii]))
+}
+out
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r test}
+lines <- readLines('input_03.txt')
+# length(lines)
+out = 0
+pattern = 'mul\\(\\d+\\,\\d+\\)'
+for(jj in 1:length(lines)){
+  line <- lines[jj]
+  line <- unlist(str_extract_all(line,pattern))
+  for(ii in 1:length(line)){
+     out <- out + eval(str2expression(line[ii]))
+    }
+}
+out
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+There are two new instructions you'll need to handle:
+
+    The do() instruction enables future mul instructions.
+    The don't() instruction disables future mul instructions.
+
+We define *do* and *don't* to redefine *mul* and return zero
+
+```{r train2}
+do <- function(){
+    mul <<- function(a,b){return(a*b)}
+    0}
+
+
+dont <- function(){
+    mul <<- function(a,b){return(0)}
+    0}
+
+mul <- function(a,b){a*b}
+# set counter
+out = 0
+pattern = "don\\'t\\(\\)|do\\(\\)|mul\\(\\d+\\,\\d+\\)"
+
+tmp <- read.table('test_1.txt')
+line <- unlist(
+  str_extract_all(tmp,pattern)
+  )
+
+for(ii in 1:length(line)){
+  if(line[ii] == "don't()"){
+    line[ii] = "dont()"
+    }
+  out <- out + eval(str2expression(line[ii]))
+}
+
+out 
+```
+
+
+No part 2
+
+```{r test2}
+lines <- readLines('input_03.txt')
+
+out = 0
+for(jj in 1:length(lines)){
+  line <- lines[jj]
+  line <- unlist(str_extract_all(line,pattern))
+  for(ii in 1:length(line)){
+      if(line[ii] == "don't()"){
+    line[ii] = "dont()"
+    }
+     out <- out + eval(str2expression(line[ii]))
+    }
+}
+out
+
+
+```
+
