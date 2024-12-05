@@ -1,0 +1,155 @@
+---
+title: "Advent of Code Day 4"
+author: "Dr Jeremiah MF Kelly"
+date: "2024-12-04"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(stringr)
+```
+
+## The training data
+A word search, we can find horizontal and vertical by using regex and transposition, then shuffle in blocks of four to find diagonals
+
+```{r train}
+xmasDiag <- function(X){
+  # X is a 4 by 4 block
+  out <- 0
+  if(X[1,1] =="X" & X[2,2] =="M" & X[3,3] =="A" & X[4,4] =="S"){
+    out <- out + 1}  
+  if(X[1,1] =="S" & X[2,2] =="A" & X[3,3] =="M" & X[4,4] =="X"){
+    out <- out + 1}  
+  if(X[4,1] =="X" & X[3,2] =="M" & X[2,3] =="A" & X[1,4] =="S"){
+    out <- out + 1} 
+  if(X[4,1] =="S" & X[3,2] =="A" & X[2,3] =="M" & X[1,4] =="X"){
+    out <- out + 1} 
+  out
+}
+
+xmasHori <- function(X){
+  # X is a 1 by 4 block
+  out <- 0
+  if(X[1] =="X" & X[2] =="M" & X[3] =="A" & X[4] =="S"){
+    out <- out + 1}
+  if(X[1] =="S" & X[2] =="A" & X[3] =="M" & X[4] =="X"){
+    out <- out + 1}
+  out
+}
+xmasVert <- function(X){
+  # X is a 4 by 1 block
+  out <- 0
+  if(X[1] =="X" & X[2] =="M" & X[3] =="A" & X[4] =="S"){
+    out <- out + 1}
+  if(X[1] =="S" & X[2] =="A" & X[3] =="M" & X[4] =="X"){
+    out <- out + 1} 
+  out
+}
+seive <- function(X, rD, cD){
+  if(missing(rD)){rD = 3}
+  if(missing(cD)){cD = 3}
+  r <- nrow(X)
+  c <- ncol(X)
+  out = 0
+  for(ii in 1:(r-rD)){
+    for(jj in 1:(c-cD)){
+      out = out + xmasDiag(X[ii:(ii+3),jj:(jj+3) ])   
+    }
+  }
+  
+  for(ii in 1:(r)){
+    for(jj in 1:(c-cD)){
+      out = out + xmasHori(X[ii,jj:(jj+3) ])   
+    }
+  }
+  
+  for(ii in 1:(r-rD)){
+    for(jj in 1:(c)){
+      out = out + xmasVert(X[ii:(ii+3),jj ])   
+    }
+  }
+  out 
+}
+tmp <- unlist(read.table('test.txt'))
+
+tmp <- str_split(tmp, '', simplify=TRUE)
+seive(tmp)
+
+dat <- unlist(read.table('input.txt'))
+dat <- str_split(dat, '', simplify=TRUE)
+seive(dat)
+
+```
+
+## Part 2
+
+```{r mas}
+
+mas <- function(Q){
+  # Q is a 3 by 3 matrix
+  out <- 0
+  
+  if(
+    (
+      (Q[1,1]=="M" & Q[2,2]=="A"&  Q[3,3]=="S") 
+     |
+      (Q[1,1]=="S" & Q[2,2]=="A"&  Q[3,3]=="M")
+    )
+    &
+    
+    (
+      (Q[1,3]=="M" & Q[2,2]=="A"&  Q[3,1]=="S") 
+     |
+      (Q[1,3]=="S" & Q[2,2]=="A"&  Q[3,1]=="M")
+    )
+  ){
+    out = out+1
+  }
+    out
+    }
+
+Q <- read.table('Q.txt')
+Q
+Q <- unlist(read.table('Q.txt'))
+Q <- str_split(Q, '', simplify=TRUE)
+mas(Q)
+
+```
+
+```{r seive}
+
+seive2 <- function(X, rD, cD){
+  if(missing(rD)){rD = 2}
+  if(missing(cD)){cD = 2}
+  r <- nrow(X)
+  c <- ncol(X)
+  out = 0
+  for(ii in 1:(r-rD)){
+    for(jj in 1:(c-cD)){
+   out = out + mas(X[ii:(ii+rD),jj:(jj+cD) ])   
+      }
+  }
+  
+ out 
+}
+
+seive2(Q)
+
+Q <- unlist(read.table('test_2.txt'))
+Q <- str_split(Q, '', simplify=TRUE)
+seive2(Q)
+
+```
+
+
+### answer
+```{r ans}
+Q <- unlist(read.table('input.txt'))
+Q <- str_split(Q, '', simplify=TRUE)
+seive2(Q)
+
+```
+

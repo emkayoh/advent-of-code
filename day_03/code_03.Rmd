@@ -3,8 +3,8 @@ title: "Advent of Code Day 3"
 author: "Dr Jeremiah MF Kelly"
 date: "2024-12-02"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -53,13 +53,15 @@ We define *do* and *don't* to redefine *mul* and return zero
 
 ```{r train2}
 do <- function(){
-    mul <<- function(a,b){return(a*b)}
-    0}
+  mul <<- function(a,b){return(a*b)}
+  0
+  }
 
 
 dont <- function(){
-    mul <<- function(a,b){return(0)}
-    0}
+  mul <<- function(a,b){return(0)}
+  0
+  }
 
 mul <- function(a,b){a*b}
 # set counter
@@ -69,15 +71,14 @@ pattern = "don\\'t\\(\\)|do\\(\\)|mul\\(\\d+\\,\\d+\\)"
 tmp <- read.table('test_1.txt')
 line <- unlist(
   str_extract_all(tmp,pattern)
-  )
+)
 
 for(ii in 1:length(line)){
   if(line[ii] == "don't()"){
     line[ii] = "dont()"
-    }
+  }
   out <- out + eval(str2expression(line[ii]))
 }
-
 out 
 ```
 
@@ -86,20 +87,17 @@ No part 2
 
 ```{r test2}
 lines <- readLines('input_03.txt')
-
 out = 0
 for(jj in 1:length(lines)){
   line <- lines[jj]
   line <- unlist(str_extract_all(line,pattern))
   for(ii in 1:length(line)){
-      if(line[ii] == "don't()"){
-    line[ii] = "dont()"
+    if(line[ii] == "don't()"){
+      line[ii] = "dont()"
     }
-     out <- out + eval(str2expression(line[ii]))
-    }
+    out <- out + eval(str2expression(line[ii]))
+  }
 }
 out
-
-
 ```
 

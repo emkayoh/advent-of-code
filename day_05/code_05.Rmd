@@ -1,0 +1,111 @@
+---
+title: "Advent of Code day 5"
+author: "Dr Jeremiah MF Kelly"
+date: "2024-12-05"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(stringr)
+rm(list = ls())
+```
+
+## source
+
+import and sort the rules
+
+
+```{r train}
+
+tmp <- readLines('input.txt')
+rule = "\\d+\\|\\d+"
+primo <- c()
+dopo <- c()
+pages <- c()
+for (ii in 1:length(tmp)){
+  dib <- str_extract(tmp[ii], rule )
+  dab <- str_split(dib, "\\|")
+  primo<- c(primo, as.numeric(dab[[1]][1]))
+  dopo <- c(dopo, as.numeric(dab[[1]][2]))
+  pages <- c(pages, str_extract(tmp[ii], "\\d+\\,.+"))
+}
+
+#  organise the rules
+dob <- data.frame(primo, dopo) 
+idx <- !is.na(primo)
+dob <- dob[idx,]
+rules <- dob[order(dob[,1], dob[,2]),]
+
+# Now get pages to print
+pages <- pages[!is.na(pages)]
+# print(pages)
+
+```
+
+apply the rules to the pages to print
+
+```{r apply}
+vol <- length(pages)
+out <- numeric(vol) +1
+mark <- c()
+
+for(vv in 1:vol){
+  dat <- pages[vv]
+  pps <- as.array(as.numeric(unlist(str_split(dat, ","))))
+  #  are there rules that say the initial page should precede subsequent ones
+  nop <- length(pps)
+  mark <- c(mark,pps[floor(nop/2)+1])
+  
+  for(ii in 1:(nop-1)){
+    bar <- rules[rules[,1]==pps[ii],]
+    if(sum(bar[bar[,2]==pps[ii+1],])==0){
+      out[vv] = 0
+      break
+    }
+  }
+}
+
+sum(out * mark)
+```
+
+Now to deal with the incorrect orders
+
+```{r incorr}
+
+vol <- length(pages)
+out <- numeric(vol) 
+mark <- numeric(vol) 
+
+for(vv in 1:vol){
+  dat <- pages[vv]
+  pps <- as.array(as.numeric(unlist(str_split(dat, ","))))
+  #  are there rules that say the initial page should precede subsequent ones
+  nop <- length(pps)
+  for(kk in 1:nop){
+    for(ii in 1:(nop-1)){
+      bar <- rules[rules[,1]==pps[ii],]
+      if(sum(bar[bar[,2]==pps[ii+1],])==0){
+        dum <- pps[ii]
+        pps[ii] <- pps[ii+1]
+        pps[ii+1] <- dum
+        mark[vv] <- pps[floor(nop/2)+1]
+        out[vv] = 1
+      }
+    }
+  }
+}
+
+sum(mark)
+
+
+
+
+```
+
+
+
+
+
