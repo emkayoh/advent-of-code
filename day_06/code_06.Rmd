@@ -1,0 +1,22 @@
+---
+title: "Advent of Code Day 6"
+author: "Dr Jeremiah MF Kelly"
+date: "2024-12-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## source
+
+import and sort the rules
+
+
+```{r train}
+
+tmp <- readLines('test.txt')
+tmp
+```
+
