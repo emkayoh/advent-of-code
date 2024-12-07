@@ -359,11 +359,48 @@ display: none;
 
 <div id="source" class="section level2">
 <h2>source</h2>
-<p>import and sort the rules</p>
-<pre class="r"><code>tmp &lt;- readLines(&#39;test.txt&#39;)
-tmp</code></pre>
-<pre><code>##  [1] &quot;....#.....&quot; &quot;.........#&quot; &quot;..........&quot; &quot;..#.......&quot; &quot;.......#..&quot;
-##  [6] &quot;..........&quot; &quot;.#..^.....&quot; &quot;........#.&quot; &quot;#.........&quot; &quot;......#...&quot;</code></pre>
+<p>Navigation puzzle so lets sort the map</p>
+<p>With matrix addresses</p>
+<pre class="r"><code>imax &lt;- 130
+jmax &lt;- 130
+
+maplet&lt;-   as.matrix(read.fwf(&quot;input.txt&quot;, widths = rep(1, imax), comment.char = &quot;&quot;))
+# maplet
+loc &lt;- which(maplet==&quot;^&quot;, arr.ind = TRUE)
+route &lt;- dir &lt;- &quot;N&quot;
+move = list(&quot;N&quot;= list(-1, 0), &quot;S&quot;= list(1, 0), &quot;W&quot;= list(0, -1), &quot;E&quot;= list(0, 1))
+path &lt;- loc
+step_to&lt;- c(1,1)
+trip &lt;- FALSE
+while(any(step_to &gt; 0) &amp; any(step_to &lt;= imax)){
+  if(trip) break
+  step_to = loc + unlist(move[dir])
+  if(any(step_to&lt;=0) | any(step_to&gt;imax)) {
+    print(&quot;Elvish has left the building&quot;)
+    trip &lt;- TRUE
+  }
+  
+  
+if(!trip){
+    if(maplet[step_to] == &quot;#&quot;){
+    dir = c(&quot;E&quot;,&quot;S&quot;,&quot;W&quot;,&quot;N&quot;)[c(&quot;N&quot;,&quot;E&quot;,&quot;S&quot;,&quot;W&quot;)==dir]
+  }else{
+    path = rbind(path, step_to)
+    route &lt;- c(route, dir)
+    loc = step_to
+    maplet[step_to]=&quot;o&quot;
+  }
+}
+
+}</code></pre>
+<pre><code>## [1] &quot;Elvish has left the building&quot;</code></pre>
+<pre class="r"><code># maplet
+# path
+# route
+# convert co-ords to index on column vector
+vect &lt;- path[,1] + (path[,2]-1)*imax
+length(unique(vect))</code></pre>
+<pre><code>## [1] 4982</code></pre>
 </div>
 
 

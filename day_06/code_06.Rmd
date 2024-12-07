@@ -7,16 +7,53 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(stringr)
 ```
 
 ## source
+Navigation puzzle so lets sort the map
 
-import and sort the rules
+With matrix addresses 
 
+```{r mats}
 
-```{r train}
+imax <- 130
+jmax <- 130
 
-tmp <- readLines('test.txt')
-tmp
+maplet<-   as.matrix(read.fwf("input.txt", widths = rep(1, imax), comment.char = ""))
+# maplet
+loc <- which(maplet=="^", arr.ind = TRUE)
+route <- dir <- "N"
+move = list("N"= list(-1, 0), "S"= list(1, 0), "W"= list(0, -1), "E"= list(0, 1))
+path <- loc
+step_to<- c(1,1)
+trip <- FALSE
+while(any(step_to > 0) & any(step_to <= imax)){
+  if(trip) break
+  step_to = loc + unlist(move[dir])
+  if(any(step_to<=0) | any(step_to>imax)) {
+    print("Elvish has left the building")
+    trip <- TRUE
+  }
+  
+  
+if(!trip){
+    if(maplet[step_to] == "#"){
+    dir = c("E","S","W","N")[c("N","E","S","W")==dir]
+  }else{
+    path = rbind(path, step_to)
+    route <- c(route, dir)
+    loc = step_to
+    maplet[step_to]="o"
+  }
+}
+
+}
+# maplet
+# path
+# route
+# convert co-ords to index on column vector
+vect <- path[,1] + (path[,2]-1)*imax
+length(unique(vect))
 ```
 
