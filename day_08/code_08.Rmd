@@ -1,0 +1,59 @@
+---
+title: "Advent of Code Day 8"
+author: "Dr Jeremiah MF Kelly"
+date: "2024-12-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Part 1
+
+```{r pt1 }
+foi <- "input.txt"
+# foi <- 'test.txt'
+tmp <- scan(foi, what = "", sep = "\n", quiet = TRUE)
+# get frequencies
+frq <- NULL
+characters <- unlist(strsplit(tmp, ""))
+characters <- characters[characters != "."]
+
+frq <- unique(characters)
+frq
+
+# Read the file line by line
+lines <- readLines(foi)
+split_lines <- lapply(lines, function(line) strsplit(line, "")[[1]])
+
+matrix_data <- do.call(rbind, split_lines)
+print(matrix_data)
+RC <-dim(matrix_data)
+out <- c()
+# locate antennae for each frequency 
+for(ii in  1:length(frq)){
+locs <- which(matrix_data==frq[ii], arr.ind = TRUE)
+
+locs <- matrix(locs, ncol=2)
+# gen deltas
+for (harmonics in 0:(RC[1]+2)){
+for(ii in 1:nrow(locs)){
+  base <- locs[ii,]
+  base <- matrix(base, nrow = nrow(locs), ncol = 2, byrow = TRUE)
+  delta <- locs- base
+  antis <- locs + harmonics*delta
+  antis <- antis[-ii,]
+  out <- rbind(out, antis)
+  # print(antis)
+}
+}
+}
+
+idx <- out[,1] > 0 & out[,1] <= RC[1] & out[,2] > 0 & out[,2] <= RC[2]
+res <- out[idx, ]
+# res[order(res[,1], res[,2]),]
+matrix_data[res] = '@'
+matrix_data
+nrow(unique(res))
+```

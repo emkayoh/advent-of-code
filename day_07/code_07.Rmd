@@ -1,0 +1,114 @@
+---
+title: "Advent of Code Day 7"
+author: "Dr Jeremiah MF Kelly"
+date: "2024-12-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Part 1
+
+
+```{r pt1}
+options(scipen = 999)
+input <- read.delim('test.txt', sep = ':', header = FALSE)
+colnames(input) <- c('calib', 'nums')
+array <- c("+", "*")
+# input
+
+
+gen_comb <- function(array, times) {
+  input_list <- rep(list(array), times)
+  combinations <- do.call(expand.grid, input_list)
+  result <- as.matrix(combinations)
+  return(result)
+}
+
+calc_eq <- function(nums, ops){
+  res <- nums[1]
+  for (i in 1:length(ops)){
+    if (ops[i] == "+") (res <- res + nums[i+1]) else (res <-  res * nums[i+1])
+  }
+  return(res)
+}
+
+
+calibration <- function(numbers, value){
+  times <- length(numbers) - 1
+  perm <- gen_comb(array, times)
+  for (i in 1:nrow(perm)){ # nolint: seq_linter.
+    res = calc_eq(numbers, perm[i,])
+    if (res == value) return(TRUE)
+    if (i == nrow(perm)) return(FALSE)
+  }
+}
+out <- numeric(nrow(input))
+for(ii in 1:nrow(input)){ 
+  value <- input[ii,1]
+  nums <- as.numeric(unlist(strsplit(trimws(input[ii,2]), " ")))
+  fixed <- calibration(nums, value)
+  out[ii] <- fixed
+}
+sum(input[,1]*out)
+```
+
+## Part 2
+
+```{r pt2}
+options(scipen = 999)
+input <- read.delim('input.txt', sep = ':', header = FALSE)
+colnames(input) <- c('calib', 'nums')
+array <- c("+", "*", "|")
+
+gen_comb <- function(array, times) {
+  input_list <- rep(list(array), times)
+  combinations <- do.call(expand.grid, input_list)
+  result <- as.matrix(combinations)
+  return(result)
+}
+
+
+calc_eq2 = function(nums, ops){
+  res = nums[1]
+  for (i in 1:length(ops)){
+    if (ops[i] == "+"){
+      res = res + nums[i+1]
+      } else if (ops[i] == "*"){
+      res =  res * nums[i+1]
+      } else {
+      res = as.numeric(paste0(res, nums[i+1]))
+      }
+  }
+  return(res)
+}
+
+calibration2 = function(numbers, value){
+  n = length(numbers)-1
+  perm = gen_comb(array, n)
+  for (i in 1:nrow(perm)){
+
+    res = calc_eq2(numbers, perm[i,])
+    if (res == value) return(TRUE)
+    if (i == nrow(perm)) return(FALSE)
+    if (res > value) next
+  }
+}
+
+out <- numeric(nrow(input))
+
+for(ii in 1:nrow(input)){
+  value <- input[ii,1]
+  nums <- as.numeric(unlist(strsplit(trimws(input[ii,2]),' ')))
+  
+  fixed = calibration2(nums, value)
+  out[ii] <- fixed
+}
+sum(input[,1]*out)
+
+
+
+```
+

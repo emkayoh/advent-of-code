@@ -1,0 +1,79 @@
+---
+title: "Advent of Code Day 9"
+author: "Dr Jeremiah MF Kelly"
+date: "2024-12-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library('stringr')
+```
+
+## Part 1
+
+
+
+
+this '12345' maps to '0..111....22222'
+
+```{r test}
+t1 <- '12345'
+t1 <- '2333133121414131402'
+
+# t1 <- readLines('input.txt')
+t1 <- unlist(str_split(t1, ''))
+noc <- length(t1)
+idx <- seq(noc)%%2==1
+diskmap <- NULL
+file_len <- as.numeric(t1[idx])
+file_len
+ids <- seq(0, length(file_len)-1)
+ids
+free_space <- as.numeric(t1[!idx])
+free_space
+
+for(ii in 1:noc){
+  jj = ii/2+0.5
+  item <- NULL
+  if(idx[ii]){
+    for(ff in 1:file_len[jj]){
+    item <- paste0(item,ids[jj])  }
+  }else{
+    if(free_space[jj]==0)next
+        for(ff in 1:free_space[jj]){
+    item <- paste0(item,".")  }
+  }
+  
+  diskmap <- paste0(diskmap,item )
+}
+diskmap
+# now reorder the diskmaps
+
+dm <- unlist(str_split(diskmap, ''))
+for( ii in 1:(1+length(dm)/2)){
+all_space <- dm == "."
+all_no <- !all_space
+idx <- 1:length(dm)
+first_space <- idx[all_space][1]
+
+last_file <- tail(idx[all_no],1)
+
+# swop places
+tmp <- dm[first_space]
+dm[first_space] <- dm[last_file]
+dm[last_file] <- tmp
+
+}
+
+last_file
+first_space
+ dm
+# checksum
+ out <- 0
+ nos <- as.numeric(dm[dm != "."])
+ for(tt in 1:length(nos)){
+   out <- out + (tt-1)*nos[tt]
+ }
+out
+```

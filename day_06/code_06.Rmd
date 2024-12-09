@@ -16,44 +16,150 @@ Navigation puzzle so lets sort the map
 With matrix addresses 
 
 ```{r mats}
+# Initialize variables
+imax <- 10
+jmax <- 10
 
+maplet <- as.matrix(read.fwf("test.txt", widths = rep(1, imax), comment.char = ""))
+loc <- which(maplet == "^", arr.ind = TRUE)  # Starting location
+route <- character(0)
+dir <- "N"
+move <- list("N" = c(-1, 0), "S" = c(1, 0), "W" = c(0, -1), "E" = c(0, 1))
+
+# Initialize path and other variables
+path <- matrix(loc, ncol = 2, byrow = TRUE)
+trip <- FALSE
+
+# Direction rotation helper
+rotate_dir <- function(current_dir) {
+  directions <- c("N", "E", "S", "W")
+  next_index <- (match(current_dir, directions) %% 4) + 1
+  return(directions[next_index])
+}
+
+while (!trip) {
+  # Calculate next step
+  step_to <- loc + move[[dir]]
+  
+  # Check if out of bounds
+  if (any(step_to <= 0) || any(step_to > imax)) {
+    message("Elvish has left the building")
+    trip <- TRUE
+    break
+  }
+  
+  # Check if path is blocked
+  if (maplet[step_to[1], step_to[2]] == "#") {
+    dir <- rotate_dir(dir)  # Change direction
+  } else {
+    # Move to the new location
+    loc <- step_to
+    path <- rbind(path, loc)
+    route <- c(route, dir)
+  }
+}
+
+# Convert coordinates to unique vector indices
+vect <- path[, 1] + (path[, 2] - 1) * imax
+unique_count <- length(unique(vect))
+
+# Output results
+cat("Unique positions visited:", unique_count, "\n")
+
+```
+
+## Part two 
+
+Put an obstacle in so that the guard walks in circles
+
+How many places can we put an obstacle to create a loop
+What defines a loop 
+if we put an obstacle at (7,4,)
+
+
+The obstacle can only be on the original path, what we can do is put an object on the path and see is a loop follows
+in a loop we get repeated patterns of location and direction
+
+```{r loops}
+
+# Initialize variables
+orig_path <- path  # Original path
 imax <- 130
 jmax <- 130
 
-maplet<-   as.matrix(read.fwf("input.txt", widths = rep(1, imax), comment.char = ""))
-# maplet
-loc <- which(maplet=="^", arr.ind = TRUE)
-route <- dir <- "N"
-move = list("N"= list(-1, 0), "S"= list(1, 0), "W"= list(0, -1), "E"= list(0, 1))
-path <- loc
-step_to<- c(1,1)
-trip <- FALSE
-while(any(step_to > 0) & any(step_to <= imax)){
-  if(trip) break
-  step_to = loc + unlist(move[dir])
-  if(any(step_to<=0) | any(step_to>imax)) {
-    print("Elvish has left the building")
-    trip <- TRUE
+reset <- as.matrix(read.fwf("input.txt", widths = rep(1, imax), comment.char = ""))
+start_loc <- which(reset == "^", arr.ind = TRUE)  # Original starting location
+loops <- 0
+
+# Function to rotate direction
+rotate_dir <- function(current_dir) {
+  directions <- c("N", "E", "S", "W")
+  next_index <- (match(current_dir, directions) %% 4) + 1
+  return(directions[next_index])
+}
+
+# Loop through the original path
+for (ii in seq_len(nrow(orig_path))) {
+  # Skip if the obstacle placement is the original starting location
+  if (all(orig_path[ii, ] == start_loc)) {
+    next
   }
-  
-  
-if(!trip){
-    if(maplet[step_to] == "#"){
-    dir = c("E","S","W","N")[c("N","E","S","W")==dir]
-  }else{
-    path = rbind(path, step_to)
-    route <- c(route, dir)
-    loc = step_to
-    maplet[step_to]="o"
+
+  # Reset starting position and map
+  loc <- which(reset == "^", arr.ind = TRUE)
+  maplet <- reset
+  maplet[orig_path[ii, 1], orig_path[ii, 2]] <- "#"  # Place obstacle
+
+  route <- character(0)
+  dir <- "N"
+  move <- list("N" = c(-1, 0), "S" = c(1, 0), "W" = c(0, -1), "E" = c(0, 1))
+  path <- matrix(loc, ncol = 2, byrow = TRUE)
+  trip <- FALSE
+  steps <- 0
+  places <- integer(0)
+
+  # Simulate movement
+  while (TRUE) {
+    steps <- steps + 1
+    step_to <- loc + move[[dir]]
+
+    # Check if Elvish has left the building
+    if (any(step_to <= 0) || any(step_to > imax)) {
+      message("Elvish has left the building")
+      trip <- TRUE
+      break
+    }
+
+    # Check if the path is blocked
+    if (maplet[step_to[1], step_to[2]] == "#") {
+      dir <- rotate_dir(dir)  # Change direction
+    } else {
+      # Move to the new location
+      loc <- step_to
+      path <- rbind(path, loc)
+      route <- c(route, dir)
+      maplet[step_to[1], step_to[2]] <- "o"
+
+      # Check for loop
+      vect <- path[, 1] + (path[, 2] - 1) * imax
+      unique_places <- length(unique(vect))
+      places <- c(unique_places, places)
+
+      # Detect loop
+      if (steps > 1000 && length(places) > 1 && places[1] == places[2]) {
+        loops <- loops + 1
+        message("It's a loop!")
+        break
+      }
+    }
   }
 }
 
-}
-# maplet
-# path
-# route
-# convert co-ords to index on column vector
-vect <- path[,1] + (path[,2]-1)*imax
-length(unique(vect))
+# Output the result
+cat("Number of loops detected:", loops, "\n")
+
+
+
 ```
+
 
