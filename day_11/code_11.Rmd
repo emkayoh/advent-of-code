@@ -26,18 +26,6 @@ tmp
     If the stone is engraved with a number that has an even number of digits, it is replaced by two stones. The left half of the digits are engraved on the new left stone, and the right half of the digits are engraved on the new right stone. (The new numbers don't keep extra leading zeroes: 1000 would become stones 10 and 0.)
     If none of the other rules apply, the stone is replaced by a new stone; the old stone's number multiplied by 2024 is engraved on the new stone.
 
-### Pseudocode
-<!-- everyBlink this happens: -->
-<!-- if(stoneNo == 0)  -->
-<!-- stone0 becomes stone1 and is inserted in place -->
-<!-- if(stoneNo length%%2 == 0) -->
-<!-- stoneEven becomes two stones with the first half to the left and second half to the right -->
-<!-- len <- floor(log10(stoneNo)+1) -->
-
-<!-- otherwise -->
-
-<!-- stoneOdd becomes stone*2024 -->
-
 
 
 ```{r funcs}
@@ -73,14 +61,4 @@ print(length(unlist(strsplit(tmp, ' '))))}
 
 ```
 
-```{r pic}
-dat <- read.table('growth')
-y <- dat$V1
-length(y)
-x <- 1:20
-plot(x, y, log = 'y')
-mod <- lm(y~x+0)
-summary(mod)
-abline(mod, col = 2)
 
-```
