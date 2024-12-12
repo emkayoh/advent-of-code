@@ -1,0 +1,86 @@
+---
+title: "Advent of Code day 11"
+author: "Dr Jeremiah MF Kelly"
+date: "2024-12-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Part 1
+
+task: 
+
+```{r pt1}
+foi <- 'test.txt'
+foi <- 'input'
+tmp <- readLines(foi)
+tmp <- unlist(strsplit(tmp, ' '))
+tmp
+```
+
+
+    If the stone is engraved with the number 0, it is replaced by a stone engraved with the number 1.
+    If the stone is engraved with a number that has an even number of digits, it is replaced by two stones. The left half of the digits are engraved on the new left stone, and the right half of the digits are engraved on the new right stone. (The new numbers don't keep extra leading zeroes: 1000 would become stones 10 and 0.)
+    If none of the other rules apply, the stone is replaced by a new stone; the old stone's number multiplied by 2024 is engraved on the new stone.
+
+### Pseudocode
+<!-- everyBlink this happens: -->
+<!-- if(stoneNo == 0)  -->
+<!-- stone0 becomes stone1 and is inserted in place -->
+<!-- if(stoneNo length%%2 == 0) -->
+<!-- stoneEven becomes two stones with the first half to the left and second half to the right -->
+<!-- len <- floor(log10(stoneNo)+1) -->
+
+<!-- otherwise -->
+
+<!-- stoneOdd becomes stone*2024 -->
+
+
+
+```{r funcs}
+ext_stone <- function(stone){
+  if (stone == "0"){
+    return(c("1 "))
+  }
+  stone <- as.numeric(stone)
+  len <- floor(log10(stone) + 1)
+  if(len%%2 ==0 ){
+    ee <- 10^(len/2)
+    ls <- floor(stone/ee)
+    rs <- stone%%ee
+    return(paste0(ls, ' ', rs, ' '))
+  }
+  paste0(stone*2024, ' ')
+}
+
+blink <- function(init){
+  init <- unlist(strsplit(init, ' '))
+  initLen <- length(init)
+  out <- ""
+  for (aa in 1:initLen){
+    out <- paste0(out, ext_stone(init[aa]))
+  }
+  out <- trimws(out)
+  return(out)
+}
+out <- c()
+for(bb in 1:75){
+tmp <- blink(tmp)
+print(length(unlist(strsplit(tmp, ' '))))}
+
+```
+
+```{r pic}
+dat <- read.table('growth')
+y <- dat$V1
+length(y)
+x <- 1:20
+plot(x, y, log = 'y')
+mod <- lm(y~x+0)
+summary(mod)
+abline(mod, col = 2)
+
+```

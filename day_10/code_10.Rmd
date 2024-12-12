@@ -1,0 +1,167 @@
+---
+title: "Advent of Code Day 10"
+author: "Dr Jeremiah MF Kelly"
+date: "2024-12-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(stringr)
+```
+
+## Part 1
+No. of peaks found not number of paths
+
+
+```{r pt1}
+
+foi <- 'test.txt'
+foi <- 'test2.txt'
+lines <- readLines(foi)
+split_lines <- lapply(lines, function(line) strsplit(line, "")[[1]])
+
+matrix_data <- do.call(rbind, split_lines)
+
+# find all zeros
+# then find all nines
+# for each zero find all paths to each nine
+findZeros <- function(block){
+  zeros <- c()
+  rc <- dim(block)
+  for (ii in 1:rc[1]){
+    for(jj in 1:rc[2]){
+      if(block[ii,jj]=="0"){
+        zeros <- rbind(zeros, c(ii,jj))
+        }
+        
+    }
+  }
+  zeros
+}
+
+trailheads <- findZeros(matrix_data)
+trailheads
+At <- function(loc, block){
+  rc <- dim(block)
+if(loc[1] > 0 && loc[1] <= rc[1] && loc[2] > 0 && loc[2] <= rc[2]){
+return(block[loc[1], loc[2]])
+}else{
+    FALSE
+  }
+}
+
+findNines <- function(loc,block){
+  cell <- as.numeric(At(c(loc[1], loc[2]), block))
+  if(cell == 9){
+    print(loc)
+    }
+
+  if(At(c(loc[1]-1, loc[2]), block) == cell+1 ){findNines(c(loc[1]-1, loc[2]), block)}
+  if(At(c(loc[1]+1, loc[2]), block) == cell+1 ){findNines(c(loc[1]+1, loc[2]), block)}
+  if(At(c(loc[1], loc[2]-1), block) == cell+1 ){findNines(c(loc[1], loc[2]-1), block)}
+  if(At(c(loc[1], loc[2]+1), block) == cell+1 ){findNines(c(loc[1], loc[2]+1), block)}
+}
+for(ii in 1:nrow(trailheads)){
+  findNines(trailheads[ii,], matrix_data)
+}
+
+```
+
+after chatgpt help 
+
+```{r chat}
+# Load data
+input <- readLines("input.txt")
+
+# Convert input to matrix
+m <- do.call(rbind, lapply(strsplit(input, ""), function(x) as.integer(x)))
+m[is.na(m)] <- -1
+
+# Define directions
+dirs <- list(
+  c(-1, 0),
+  c(1, 0),
+  c(0, 1),
+  c(0, -1)
+)
+
+# Helper function to get value from matrix
+get_val <- function(r, c) {
+  if (r < 1 || r > nrow(m) || c < 1 || c > ncol(m)) {
+    return(-1)
+  } else {
+    return(m[r, c])
+  }
+}
+
+# Function to count trails
+count_trails <- function(r, c, path = character()) {
+  x <- m[r, c]
+  
+  if (x == 9) {
+    return(paste0("(", r, ",", c, ")"))
+  }
+  
+  new_pos <- lapply(dirs, function(d) c(r, c) + d)
+  new_val <- sapply(new_pos, function(pos) get_val(pos[1], pos[2]))
+
+  idx <- which(new_val == x + 1)
+
+  if (length(idx) == 0) {
+    return(NULL)
+  } else {
+    trails <- unlist(lapply(idx, function(i) {
+      new_path <- c(path, paste0("(", new_pos[[i]][1], ",", new_pos[[i]][2], ")"))
+      count_trails(new_pos[[i]][1], new_pos[[i]][2], new_path)
+    }))
+    return(trails)
+  }
+}
+
+# Part 1: Calculate unique trail lengths
+part1_result <- sum(
+  apply(which(m == 0, arr.ind = TRUE), 1, function(x) {
+    length(unique(count_trails(x[1], x[2])))
+  })
+)
+
+# Reset the matrix for Part 2
+m <- do.call(rbind, lapply(strsplit(input, ""), function(x) as.integer(x)))
+m[is.na(m)] <- -1
+
+# Function to count trails (Part 2)
+count_trails_part2 <- function(r, c, path = character()) {
+  x <- m[r, c]
+  
+  if (x == 9) {
+    return(1)
+  }
+  
+  new_pos <- lapply(dirs, function(d) c(r, c) + d)
+  new_val <- sapply(new_pos, function(pos) get_val(pos[1], pos[2]))
+
+  idx <- which(new_val == x + 1)
+
+  if (length(idx) == 0) {
+    return(0)
+  } else {
+    total <- sum(sapply(idx, function(i) {
+      new_path <- c(path, paste0("(", new_pos[[i]][1], ",", new_pos[[i]][2], ")"))
+      count_trails_part2(new_pos[[i]][1], new_pos[[i]][2], new_path)
+    }))
+    return(total)
+  }
+}
+
+# Part 2: Calculate total trails
+part2_result <- sum(
+  apply(which(m == 0, arr.ind = TRUE), 1, function(x) {
+    count_trails_part2(x[1], x[2])
+  })
+)
+
+# Print results
+cat("Part 1 Result:", part1_result, "\n")
+cat("Part 2 Result:", part2_result, "\n")
+```
