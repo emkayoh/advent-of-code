@@ -1,0 +1,117 @@
+---
+title: "Advent of Code Day 24"
+author: "Dr. Jeremiah MF Kelly"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(stringr)
+```
+
+## Prt 1
+
+```{r pt1}
+
+and <- function(a,b){
+  a&b
+}
+
+or <- function(a,b){
+  a|b
+}
+
+foi <- 'test.txt'
+foi <- 'input.txt'
+
+dat <- readLines(foi)
+dat
+initial_conditions <- unlist(str_extract_all(dat, '[a-z]\\d+:\\s\\d+'))
+noi <- length(initial_conditions)
+for (ii in 1:noi){
+  tmp <- unlist(str_split(initial_conditions[ii], ':'))
+  out <- list()
+  out$line <- tmp[1]
+  out$state <- as.numeric(tmp[2])
+  assign(out$line,out$state)
+}
+
+inputs <- unlist(str_extract_all(dat, '[a-z]+\\d*\\s(AND|OR|XOR)\\s[a-z]+\\d*'))
+input <- inputs[1]
+input
+
+funcs <-  unlist(str_extract_all(dat, '(AND|OR|XOR)'))
+func <- funcs[1]
+
+
+
+outputs <- unlist(str_extract_all(dat, '>\\s[a-z]+\\d*'))
+outputs <- unlist(str_extract_all(outputs, '[a-z]+\\d*'))
+
+```
+```{r chat}
+
+# Read the input
+input_lines <- dat
+
+# Separate initial conditions and commands
+initial_conditions <- grep(":", input_lines, value = TRUE)
+commands <- grep("->", input_lines, value = TRUE)
+
+# Parse initial conditions
+state <- setNames(as.numeric(gsub(".*: ", "", initial_conditions)),
+                  gsub(":.*", "", initial_conditions))
+
+# Helper functions for logical operations
+logical_ops <- list(
+  "AND" = function(a, b) as.numeric(a & b),
+  "OR" = function(a, b) as.numeric(a | b),
+  "XOR" = function(a, b) as.numeric(xor(a, b))
+)
+
+# Process commands in cascaded iterations
+unprocessed_commands <- commands
+while (length(unprocessed_commands) > 0) {
+  successfully_processed <- character()
+  
+  for (command in unprocessed_commands) {
+    # Parse the command
+    matches <- regexec("(\\w+) (AND|OR|XOR) (\\w+) -> (\\w+)", command)
+    parts <- regmatches(command, matches)[[1]]
+    
+    if (length(parts) == 5) {
+      input1 <- parts[2]
+      operation <- parts[3]
+      input2 <- parts[4]
+      output <- parts[5]
+      
+      # Check if both inputs are resolved
+      if (input1 %in% names(state) && input2 %in% names(state)) {
+        state[[output]] <- logical_ops[[operation]](state[[input1]], state[[input2]])
+        successfully_processed <- c(successfully_processed, command)
+      }
+    }
+  }
+  
+  # Remove successfully processed commands from the unprocessed list
+  unprocessed_commands <- setdiff(unprocessed_commands, successfully_processed)
+  
+
+}
+
+
+sorted_state <- state[order(names(state), decreasing = TRUE)]
+
+ # Print the sorted state
+binary_values <- sorted_state[1:46]
+binary_string <- paste(binary_values, collapse = "")
+print(binary_string)
+
+
+BinToDec <- function(x) 
+    sum(2^(which(rev(unlist(strsplit(as.character(x), "")) == 1))-1))
+BinToDec(binary_string)
+
+
+```
